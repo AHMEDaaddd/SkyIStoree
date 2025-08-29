@@ -1,0 +1,27 @@
+# IDE
+.idea/
+.vscode/
+
+# venv
+venv/
+.env
+.env.*
+env/
+ENV/
+
+# Python cache
+__pycache__/
+*.py[cod]
+*.pyo
+*.pyd
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Django / SQLite
+*.sqlite3
+db.sqlite3
+
+# misc
+*.log
