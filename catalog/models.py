@@ -7,18 +7,12 @@ class Category(models.Model):
     created_at = models.DateTimeField("Создано", auto_now_add=True)
     updated_at = models.DateTimeField("Обновлено", auto_now=True)
 
-    class Contact(models.Model):
-        title = models.CharField("Заголовок", max_length=150, default="Контакты")
-        address = models.CharField("Адрес", max_length=255, blank=True)
-        phone = models.CharField("Телефон", max_length=50, blank=True)
-        email = models.EmailField("E-mail", blank=True)
+    class Meta:
+        verbose_name = "Категория"
+        verbose_name_plural = "Категории"
 
-        class Meta:
-            verbose_name = "Категория"
-            verbose_name_plural = "Категории"
-
-        def __str__(self) -> str:
-            return self.name
+    def __str__(self) -> str:
+        return self.name
 
 
 class Product(models.Model):
