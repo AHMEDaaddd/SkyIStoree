@@ -1,16 +1,18 @@
+from catalog.models import Product
 from django.shortcuts import render
+from .models import Contact
 
 def home_view(request):
-    return render(request, 'catalog/home.html')  # рендер главной
+    last_five = Product.objects.order_by("-created_at")[:5]
+    return render(request, "catalog/home.html", {"last_five": last_five})
 
 def contacts_view(request):
-    # Доп. задание: простая обработка формы без БД
     context = {}
-    if request.method == 'POST':
-        name = request.POST.get('name', '').strip()
-        phone = request.POST.get('phone', '').strip()
-        message = request.POST.get('message', '').strip()
-        # Здесь можно добавить любую логику/валидацию/отправку
+    if request.method == "POST":
+        name = request.POST.get("name", "").strip()
+        phone = request.POST.get("phone", "").strip()
+        message = request.POST.get("message", "").strip()
         if name and phone and message:
-            context['success'] = 'Сообщение успешно отправлено!'
-    return render(request, 'catalog/contacts.html', context)
+            context["success"] = "Сообщение успешно отправлено!"
+    context["contact"] = Contact.objects.first()
+    return render(request, "catalog/contacts.html", context)
