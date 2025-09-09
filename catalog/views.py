@@ -4,6 +4,7 @@ from .models import Contact
 
 def home_view(request):
     last_five = Product.objects.order_by("-created_at")[:5]
+    print("Последние 5 продуктов:", [p.name for p in last_five])  # или через logger
     return render(request, "catalog/home.html", {"last_five": last_five})
 
 def contacts_view(request):
