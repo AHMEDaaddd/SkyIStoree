@@ -1,24 +1,7 @@
-from django.shortcuts import render, get_object_or_404, redirect
-from django.core.paginator import Paginator
-from django.shortcuts import render
-from .models import Product, Contact
 from django import forms
-
-def home_view(request):
-    last_five = Product.objects.order_by("-created_at")[:5]
-    print("Последние 5 продуктов:", [p.name for p in last_five])  # или через logger
-    return render(request, "catalog/home.html", {"last_five": last_five})
-
-def contacts_view(request):
-    context = {}
-    if request.method == "POST":
-        name = request.POST.get("name", "").strip()
-        phone = request.POST.get("phone", "").strip()
-        message = request.POST.get("message", "").strip()
-        if name and phone and message:
-            context["success"] = "Сообщение успешно отправлено!"
-    context["contact"] = Contact.objects.first()
-    return render(request, "catalog/contacts.html", context)
+from django.core.paginator import Paginator
+from django.shortcuts import render, get_object_or_404, redirect
+from .models import Product, Contact
 
 
 def home_view(request):
@@ -46,17 +29,19 @@ def contacts_view(request):
     return render(request, "catalog/contacts.html", context)
 
 
+# ⭐ Доп. задание: форма создания товара
 class ProductForm(forms.ModelForm):
-     class Meta:
-         model = Product
-         fields = ["name", "description", "image", "category", "price"]
+    class Meta:
+        model = Product
+        fields = ["name", "description", "image", "category", "price"]
+
 
 def product_create_view(request):
-     if request.method == "POST":
-         form = ProductForm(request.POST, request.FILES)
-         if form.is_valid():
-             product = form.save()
-             return redirect("catalog:product_detail", pk=product.pk)
-     else:
-         form = ProductForm()
-     return render(request, "catalog/product_form.html", {"form": form})
+    if request.method == "POST":
+        form = ProductForm(request.POST, request.FILES)
+        if form.is_valid():
+            product = form.save()
+            return redirect("catalog:product_detail", pk=product.pk)
+    else:
+        form = ProductForm()
+    return render(request, "catalog/product_form.html", {"form": form})
