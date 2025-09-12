@@ -1,7 +1,8 @@
 {% extends "base.html" %}
 
-{% block content %}
+{% block title %}Контакты — Skystore{% endblock %}
 
+{% block content %}
 {% if success %}
 <div class="container">
   <div class="alert alert-success" role="alert">
@@ -12,28 +13,21 @@
 
 <div class="container">
   <div class="row text-start">
-    <!-- Левая часть: контакты -->
     <div class="col-lg-9 col-md-6 col-sm-12">
       <h2>Контакты</h2>
+      {% if contact %}
       <table class="table table-striped">
         <tbody>
-          <tr>
-            <th>Адрес:</th>
-            <td>г. Москва, ул. Примерная, д. 1</td>
-          </tr>
-          <tr>
-            <th>Телефон:</th>
-            <td>+7 (900) 123-45-67</td>
-          </tr>
-          <tr>
-            <th>Email:</th>
-            <td>info@skystore.ru</td>
-          </tr>
+        <tr><th>Адрес:</th><td>{{ contact.address }}</td></tr>
+        <tr><th>Телефон:</th><td>{{ contact.phone }}</td></tr>
+        <tr><th>Email:</th><td>{{ contact.email }}</td></tr>
         </tbody>
       </table>
+      {% else %}
+      <div class="alert alert-info">Контактные данные пока не добавлены.</div>
+      {% endif %}
     </div>
 
-    <!-- Правая часть: форма -->
     <div class="col-lg-3 col-md-6 col-sm-12">
       <div class="card mb-4 box-shadow">
         <div class="card-header">
@@ -59,7 +53,7 @@
         </div>
       </div>
     </div>
+
   </div>
 </div>
-
 {% endblock %}
