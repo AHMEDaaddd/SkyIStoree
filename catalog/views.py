@@ -2,6 +2,7 @@ from django.shortcuts import render, get_object_or_404, redirect
 from django.core.paginator import Paginator
 from django.shortcuts import render
 from .models import Product, Contact
+from django import forms
 
 def home_view(request):
     last_five = Product.objects.order_by("-created_at")[:5]
