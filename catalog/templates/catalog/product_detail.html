@@ -1,39 +1,47 @@
 {% extends "base.html" %}
 
-{% block title %}{{ product.name }} — Skystore{% endblock %}
+{% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-<div class="container">
-  <a href="{% url 'catalog:home' %}" class="btn btn-link ps-0">← Назад к каталогу</a>
-
-  <div class="row gy-4 mt-3">
-    <!-- Левая колонка: картинка -->
-    <div class="col-md-5">
-      {% if product.image %}
-        <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded border">
-      {% else %}
-        <div class="border rounded d-flex align-items-center justify-content-center" style="height: 320px;">
-          <span class="text-muted">Нет изображения</span>
-        </div>
-      {% endif %}
-    </div>
-
-    <!-- Правая колонка: описание -->
-    <div class="col-md-7">
-      <h1 class="h3">{{ product.name }}</h1>
-      <p class="text-muted mb-1">Категория: {{ product.category }}</p>
-      <p class="fs-4 fw-semibold">{{ product.price }} $</p>
-      <hr>
-      <div>
-        <h2 class="h5">Описание</h2>
-        <p class="mb-0">{{ product.description|default:"Описание отсутствует" }}</p>
-      </div>
-      <hr>
-      <div class="text-muted small">
-        Создан: {{ product.created_at|date:"d.m.Y H:i" }}<br>
-        Обновлён: {{ product.updated_at|date:"d.m.Y H:i" }}
-      </div>
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">{{ product.name }}</h1>
+    <div class="d-flex gap-2">
+      <a class="btn btn-outline-primary" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+      <a class="btn btn-outline-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
     </div>
   </div>
+
+  <div class="row g-4">
+    <div class="col-md-5">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+      {% else %}
+        <div class="border rounded p-5 text-center text-muted">Нет изображения</div>
+      {% endif %}
+    </div>
+    <div class="col-md-7">
+      {% if product.description %}
+        <p class="mb-3">{{ product.description }}</p>
+      {% endif %}
+
+      {% if product.price is not None %}
+        <p class="mb-1"><strong>Цена:</strong> {{ product.price }}</p>
+      {% endif %}
+
+      <p class="mb-0">
+        <strong>Статус:</strong>
+        {% if product.is_published %}
+          <span class="badge bg-success">Опубликован</span>
+        {% else %}
+          <span class="badge bg-secondary">Черновик</span>
+        {% endif %}
+      </p>
+    </div>
+  </div>
+
+  <hr class="my-4">
+
+  <a href="{% url 'catalog:home' %}" class="btn btn-link">&larr; К каталогу</a>
 </div>
 {% endblock %}

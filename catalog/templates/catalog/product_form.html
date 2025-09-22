@@ -1,16 +1,52 @@
 {% extends "base.html" %}
+{% load static %}
 
-{% block title %}Добавить товар — Skystore{% endblock %}
+{% block title %}{% if object %}Редактировать{% else %}Добавить{% endif %} товар{% endblock %}
 
 {% block content %}
-<div class="container">
-  <h1 class="mb-4">Добавить товар</h1>
-  <form method="post" enctype="multipart/form-data" class="row g-3">
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">{% if object %}Редактировать{% else %}Добавить{% endif %} товар</h1>
+  </div>
+
+  <form method="post" enctype="multipart/form-data" novalidate>
     {% csrf_token %}
-    {{ form.as_p }}
-    <div>
-      <button type="submit" class="btn btn-primary">Сохранить</button>
-      <a href="{% url 'catalog:home' %}" class="btn btn-outline-secondary">Отмена</a>
+
+    {# Общие ошибки формы #}
+    {% if form.non_field_errors %}
+      <div class="alert alert-danger">
+        {{ form.non_field_errors }}
+      </div>
+    {% endif %}
+
+    {# Рендерим поля вручную, чтобы корректно отрисовать чекбокс #}
+    {% for field in form %}
+      <div class="mb-3">
+        {% if field.widget_type == "checkbox" %}
+          <div class="form-check">
+            {{ field }}
+            <label class="form-check-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          </div>
+        {% else %}
+          <label class="form-label" for="{{ field.id_for_label }}">{{ field.label }}</label>
+          {{ field }}
+        {% endif %}
+        {% if field.help_text %}
+          <div class="form-text">{{ field.help_text }}</div>
+        {% endif %}
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">
+            {{ field.errors|join:", " }}
+          </div>
+        {% endif %}
+      </div>
+    {% endfor %}
+
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-primary">
+        {% if object %}Сохранить{% else %}Создать{% endif %}
+      </button>
+      <a href="{% if object %}{% url 'catalog:product_detail' object.pk %}{% else %}{% url 'catalog:home' %}{% endif %}" class="btn btn-outline-secondary">Отмена</a>
     </div>
   </form>
 </div>

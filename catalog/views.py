@@ -1,17 +1,28 @@
-from django.views.generic import TemplateView, ListView, DetailView
-from django.shortcuts import get_object_or_404
-from .models import Product, Contact
+from __future__ import annotations
+
+from django.urls import reverse, reverse_lazy
+from django.views.generic import (
+    ListView,
+    DetailView,
+    CreateView,
+    UpdateView,
+    DeleteView,
+    TemplateView,
+)
+
+from .forms import ProductForm
+from .models import Product
 
 
 class HomeView(ListView):
     model = Product
     template_name = "catalog/home.html"
-    context_object_name = "products"      # в шаблоне будем итерироваться по page_obj.object_list
-    paginate_by = 8
+    context_object_name = "products"
+    queryset = Product.objects.all().order_by("-id")
 
-    def get_queryset(self):
-        # последние товары первыми
-        return Product.objects.order_by("-created_at")
+
+class ContactsView(TemplateView):
+    template_name = "catalog/contacts.html"
 
 
 class ProductDetailView(DetailView):
@@ -20,20 +31,27 @@ class ProductDetailView(DetailView):
     context_object_name = "product"
 
 
-class ContactsView(TemplateView):
-    template_name = "catalog/contacts.html"
+class ProductCreateView(CreateView):
+    model = Product
+    form_class = ProductForm
+    template_name = "catalog/product_form.html"
 
-    def get_context_data(self, **kwargs):
-        ctx = super().get_context_data(**kwargs)
-        ctx["contact"] = Contact.objects.first()
-        return ctx
+    def get_success_url(self):
+        return self.object.get_absolute_url() if hasattr(self.object, "get_absolute_url") \
+            else reverse("catalog:product_detail", kwargs={"pk": self.object.pk})
 
-    def post(self, request, *args, **kwargs):
-        # имитируем «успешную отправку», показываем alert
-        ctx = self.get_context_data(**kwargs)
-        name = request.POST.get("name", "").strip()
-        phone = request.POST.get("phone", "").strip()
-        message = request.POST.get("message", "").strip()
-        if name and phone and message:
-            ctx["success"] = "Сообщение успешно отправлено!"
-        return self.render_to_response(ctx)
+
+class ProductUpdateView(UpdateView):
+    model = Product
+    form_class = ProductForm
+    template_name = "catalog/product_form.html"
+
+    def get_success_url(self):
+        return self.object.get_absolute_url() if hasattr(self.object, "get_absolute_url") \
+            else reverse("catalog:product_detail", kwargs={"pk": self.object.pk})
+
+
+class ProductDeleteView(DeleteView):
+    model = Product
+    template_name = "catalog/product_confirm_delete.html"
+    success_url = reverse_lazy("catalog:home")

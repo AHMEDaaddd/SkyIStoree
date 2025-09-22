@@ -26,9 +26,21 @@ class Product(models.Model):
     created_at = models.DateTimeField("Создано", auto_now_add=True)
     updated_at = models.DateTimeField("Обновлено", auto_now=True)
 
+    is_published = models.BooleanField("Опубликован", default=True)
+
+    def get_absolute_url(self):
+        from django.urls import reverse
+        return reverse("catalog:product_detail", kwargs={"pk": self.pk})
+
+
+    def __str__(self) -> str:
+        return getattr(self, "name", f"Product #{self.pk}")
+
+
     class Meta:
         verbose_name = "Продукт"
         verbose_name_plural = "Продукты"
+
 
     def __str__(self) -> str:
         return self.name
@@ -43,6 +55,7 @@ class Contact(models.Model):
     class Meta:
         verbose_name = "Контакт"
         verbose_name_plural = "Контакты"
+
 
     def __str__(self) -> str:
         return self.title
