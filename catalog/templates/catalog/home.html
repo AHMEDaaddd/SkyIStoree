@@ -1,42 +1,36 @@
 {% extends "base.html" %}
+{% load static %}
+{% load catalog_extras %}
 
 {% block title %}Главная{% endblock %}
 
 {% block content %}
 <div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">Каталог</h1>
-    <a href="{% url 'catalog:product_create' %}" class="btn btn-success">Добавить товар</a>
-  </div>
-
-  {% if products %}
-    <div class="row row-cols-1 row-cols-md-2 row-cols-lg-3 g-3">
-      {% for p in products %}
-        <div class="col">
-          <div class="card h-100">
-            {% if p.image %}
-              <img src="{{ p.image.url }}" class="card-img-top" alt="{{ p.name }}">
-            {% endif %}
-            <div class="card-body">
-              <h5 class="card-title">{{ p.name }}</h5>
-              {% if p.price is not None %}
-                <p class="card-text mb-1"><strong>Цена:</strong> {{ p.price }}</p>
-              {% endif %}
-              {% if p.is_published %}
-                <span class="badge bg-success">Опубликован</span>
-              {% else %}
-                <span class="badge bg-secondary">Черновик</span>
-              {% endif %}
-            </div>
-            <div class="card-footer bg-transparent border-0">
-              <a class="btn btn-sm btn-primary" href="{% url 'catalog:product_detail' p.pk %}">Открыть</a>
+  <h1 class="mb-4">Каталог</h1>
+  <div class="row row-cols-1 row-cols-md-3 g-4">
+    {% for p in products %}
+      <div class="col">
+        <div class="card h-100">
+          {% if p.image %}
+            <img src="{{ p.image.url }}" class="card-img-top" alt="{{ p.name }}">
+          {% else %}
+            <img src="{% static 'img/no_photo.png' %}" class="card-img-top" alt="Нет фото">
+          {% endif %}
+          <div class="card-body">
+            <h5 class="card-title">{{ p.name }}</h5>
+            <p class="card-text text-muted">
+              {{ p.description|truncatechars:60 }}
+            </p>
+            <div class="d-flex justify-content-between align-items-center">
+              <span class="fw-semibold">{{ p.price|usd }}</span>
+              <a class="btn btn-sm btn-primary" href="{% url 'catalog:product_detail' p.pk %}">Подробнее</a>
             </div>
           </div>
         </div>
-      {% endfor %}
-    </div>
-  {% else %}
-    <div class="alert alert-info">Пока нет товаров. Создайте первый!</div>
-  {% endif %}
+      </div>
+    {% empty %}
+      <p>Нет товаров для отображения.</p>
+    {% endfor %}
+  </div>
 </div>
 {% endblock %}

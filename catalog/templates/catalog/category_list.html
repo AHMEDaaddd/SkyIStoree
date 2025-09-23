@@ -1,0 +1,30 @@
+{% extends "base.html" %}
+
+{% block title %}Категории{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h3 mb-3">Категории</h1>
+
+  <div class="row g-3">
+    {% for c in categories %}
+      <div class="col-md-6 col-lg-4">
+        <a href="{% url 'catalog:category_detail' c.pk %}" class="text-decoration-none">
+          <div class="card h-100">
+            <div class="card-body">
+              <div class="fw-semibold mb-1">{{ c.name }}</div>
+              {% if c.description %}
+                <div class="text-muted small">{{ c.description }}</div>
+              {% endif %}
+            </div>
+          </div>
+        </a>
+      </div>
+    {% empty %}
+      <div class="col">
+        <div class="alert alert-info">Категорий пока нет.</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}

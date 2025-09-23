@@ -3,26 +3,84 @@
     "model": "catalog.product",
     "pk": 1,
     "fields": {
-      "name": "Phone X",
-      "description": "",
-      "image": null,
+      "name": "iPhone 15 Pro",
+      "description": "Флагманский смартфон Apple с процессором A17 Pro",
+      "price": 1199,
       "category": 1,
-      "price": "749.00",
-      "created_at": "2025-08-30T12:05:00Z",
-      "updated_at": "2025-08-30T12:05:00Z"
+      "is_published": true,
+      "image": "products/iphone15pro.jpg",
+      "created_at": "2025-01-01T00:00:00Z",
+      "updated_at": "2025-01-10T00:00:00Z"
     }
   },
   {
     "model": "catalog.product",
     "pk": 2,
     "fields": {
-      "name": "UltraBook Z",
-      "description": "",
-      "image": null,
+      "name": "MacBook Air M2",
+      "description": "Тонкий и лёгкий ноутбук Apple на процессоре M2",
+      "price": 1499,
       "category": 2,
-      "price": "1299.00",
-      "created_at": "2025-08-30T12:06:00Z",
-      "updated_at": "2025-08-30T12:06:00Z"
+      "is_published": true,
+      "image": "products/macbook_air_m2.jpg",
+      "created_at": "2025-01-02T00:00:00Z",
+      "updated_at": "2025-01-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 3,
+    "fields": {
+      "name": "AirPods Pro 2",
+      "description": "Беспроводные наушники с активным шумоподавлением",
+      "price": 249,
+      "category": 3,
+      "is_published": true,
+      "image": "products/airpods_pro2.jpg",
+      "created_at": "2025-01-03T00:00:00Z",
+      "updated_at": "2025-01-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 4,
+    "fields": {
+      "name": "Samsung Neo QLED 65”",
+      "description": "Телевизор 8K с высоким уровнем контраста и яркости",
+      "price": 2999,
+      "category": 4,
+      "is_published": true,
+      "image": "products/samsung_neo_qled_65.jpg",
+      "created_at": "2025-01-04T00:00:00Z",
+      "updated_at": "2025-01-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 5,
+    "fields": {
+      "name": "PlayStation 5",
+      "description": "Игровая приставка Sony нового поколения",
+      "price": 599,
+      "category": 5,
+      "is_published": true,
+      "image": "products/ps5.jpg",
+      "created_at": "2025-01-05T00:00:00Z",
+      "updated_at": "2025-01-10T00:00:00Z"
+    }
+  },
+  {
+    "model": "catalog.product",
+    "pk": 6,
+    "fields": {
+      "name": "Apple Watch Ultra 2",
+      "description": "Смарт-часы для спорта и активного образа жизни",
+      "price": 799,
+      "category": 6,
+      "is_published": true,
+      "image": "products/apple_watch_ultra2.jpg",
+      "created_at": "2025-01-06T00:00:00Z",
+      "updated_at": "2025-01-10T00:00:00Z"
     }
   }
 ]

@@ -1,47 +1,34 @@
 {% extends "base.html" %}
+{% load static %}
+{% load catalog_extras %}
 
 {% block title %}{{ product.name }}{% endblock %}
 
 {% block content %}
-<div class="container py-4">
-  <div class="d-flex justify-content-between align-items-center mb-3">
-    <h1 class="h3 mb-0">{{ product.name }}</h1>
-    <div class="d-flex gap-2">
-      <a class="btn btn-outline-primary" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
-      <a class="btn btn-outline-danger" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
-    </div>
-  </div>
-
-  <div class="row g-4">
-    <div class="col-md-5">
+<div class="container py-4" style="max-width: 1140px;">
+  <div class="row">
+    <!-- Фото слева -->
+    <div class="col-md-6">
       {% if product.image %}
-        <img src="{{ product.image.url }}" class="img-fluid rounded" alt="{{ product.name }}">
+        <img src="{{ product.image.url }}" class="img-fluid rounded mb-3" alt="{{ product.name }}">
       {% else %}
-        <div class="border rounded p-5 text-center text-muted">Нет изображения</div>
+        <img src="{% static 'img/no_photo.png' %}" class="img-fluid rounded mb-3" alt="Нет фото">
       {% endif %}
     </div>
-    <div class="col-md-7">
-      {% if product.description %}
-        <p class="mb-3">{{ product.description }}</p>
-      {% endif %}
 
-      {% if product.price is not None %}
-        <p class="mb-1"><strong>Цена:</strong> {{ product.price }}</p>
-      {% endif %}
+    <!-- Описание справа -->
+    <div class="col-md-6">
+      <h1 class="h3 mb-3">{{ product.name }}</h1>
 
-      <p class="mb-0">
-        <strong>Статус:</strong>
-        {% if product.is_published %}
-          <span class="badge bg-success">Опубликован</span>
-        {% else %}
-          <span class="badge bg-secondary">Черновик</span>
-        {% endif %}
+      <!-- Полное описание -->
+      <p class="text-muted" style="white-space:pre-line;">
+        {{ product.description }}
       </p>
+
+      <p class="fs-5 fw-semibold mb-3">Цена: {{ product.price|usd }}</p>
+
+      <a class="btn btn-outline-secondary" href="{% url 'catalog:home' %}">← Назад</a>
     </div>
   </div>
-
-  <hr class="my-4">
-
-  <a href="{% url 'catalog:home' %}" class="btn btn-link">&larr; К каталогу</a>
 </div>
 {% endblock %}

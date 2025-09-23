@@ -16,9 +16,24 @@ INSTALLED_APPS = [
     "django.contrib.sessions",
     "django.contrib.messages",
     "django.contrib.staticfiles",
+
+    # мои приложения
     "catalog",
     "blog",
+    "users",   # ✅ добавлено
 ]
+
+# кастомная модель пользователя
+AUTH_USER_MODEL = "users.User"
+
+# аутентификация и редиректы
+LOGIN_URL = "users:login"
+LOGIN_REDIRECT_URL = "catalog:home"
+LOGOUT_REDIRECT_URL = "catalog:home"
+
+# email — на этапе разработки выводим письма в консоль
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@skystore.local"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -51,12 +66,8 @@ WSGI_APPLICATION = "core.wsgi.application"
 
 DATABASES = {
     "default": {
-        "ENGINE": "django.db.backends.postgresql",
-        "NAME": os.getenv("DB_NAME"),
-        "USER": os.getenv("DB_USER"),
-        "PASSWORD": os.getenv("DB_PASSWORD"),
-        "HOST": os.getenv("DB_HOST", "localhost"),
-        "PORT": os.getenv("DB_PORT", "5432"),
+        "ENGINE": "django.db.backends.sqlite3",
+        "NAME": BASE_DIR / "db2.sqlite3",
     }
 }
 
