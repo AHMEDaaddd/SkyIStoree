@@ -1,0 +1,42 @@
+{% extends "base.html" %}
+{% load catalog_extras %}
+
+{% block title %}{{ category.name }} — каталог{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="h3 mb-0">{{ category.name }}</h1>
+    <a class="btn btn-outline-secondary btn-sm" href="{% url 'catalog:category_list' %}">← Все категории</a>
+  </div>
+  {% if category.description %}
+    <p class="text-muted">{{ category.description }}</p>
+  {% endif %}
+
+  <div class="row g-3">
+    {% for p in products %}
+      <div class="col-md-6 col-lg-4">
+        <div class="card h-100">
+          {% if p.image %}
+            <img src="{{ p.image.url }}" class="card-img-top" alt="{{ p.name }}">
+          {% endif %}
+          <div class="card-body d-flex flex-column">
+            <h5 class="card-title mb-2">{{ p.name }}</h5>
+            {% if p.description %}
+              <p class="card-text text-muted small mb-2">{{ p.description|truncatechars:60 }}</p>
+            {% endif %}
+            <div class="mt-auto">
+              <div class="fw-semibold mb-2">Цена: {{ p.price|usd }}</div>
+              <a class="btn btn-primary btn-sm" href="{% url 'catalog:product_detail' p.pk %}">Подробнее</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    {% empty %}
+      <div class="col">
+        <div class="alert alert-info">В этой категории пока нет товаров.</div>
+      </div>
+    {% endfor %}
+  </div>
+</div>
+{% endblock %}
