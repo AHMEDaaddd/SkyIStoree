@@ -1,0 +1,50 @@
+[
+  {
+    "model": "catalog.category",
+    "pk": 1,
+    "fields": {
+      "name": "Смартфоны",
+      "description": "Современные телефоны с сенсорным экраном"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 2,
+    "fields": {
+      "name": "Ноутбуки",
+      "description": "Персональные компьютеры для работы и учебы"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 3,
+    "fields": {
+      "name": "Наушники",
+      "description": "Беспроводные и проводные аудиоустройства"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 4,
+    "fields": {
+      "name": "Телевизоры",
+      "description": "Устройства для просмотра фильмов и сериалов"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 5,
+    "fields": {
+      "name": "Игровые приставки",
+      "description": "PlayStation, Xbox и другие консоли"
+    }
+  },
+  {
+    "model": "catalog.category",
+    "pk": 6,
+    "fields": {
+      "name": "Смарт-часы",
+      "description": "Умные часы и фитнес-браслеты"
+    }
+  }
+]

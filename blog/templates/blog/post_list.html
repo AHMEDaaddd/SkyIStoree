@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Блог — Skystore{% endblock %}
+
+{% block content %}
+<div class="container">
+  <div class="d-flex justify-content-between align-items-center mb-3">
+    <h1 class="mb-0">Блог</h1>
+    <a class="btn btn-primary" href="{% url 'blog:create' %}">Новая статья</a>
+  </div>
+
+  {% if posts %}
+    <div class="list-group">
+      {% for post in posts %}
+        <a class="list-group-item list-group-item-action" href="{% url 'blog:detail' post.pk %}">
+          <div class="d-flex w-100 justify-content-between">
+            <h5 class="mb-1">{{ post.title }}</h5>
+            <small class="text-muted">{{ post.created_at|date:"d.m.Y H:i" }}</small>
+          </div>
+          <p class="mb-1 text-muted">{{ post.body|truncatechars:140 }}</p>
+          <small class="text-muted">Просмотры: {{ post.views }}</small>
+        </a>
+      {% endfor %}
+    </div>
+
+    <nav class="mt-4" aria-label="Навигация">
+      <ul class="pagination justify-content-center">
+        {% if page_obj.has_previous %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.previous_page_number }}">«</a></li>
+        {% else %}<li class="page-item disabled"><span class="page-link">«</span></li>{% endif %}
+        <li class="page-item active"><span class="page-link">{{ page_obj.number }}</span></li>
+        {% if page_obj.has_next %}
+          <li class="page-item"><a class="page-link" href="?page={{ page_obj.next_page_number }}">»</a></li>
+        {% else %}<li class="page-item disabled"><span class="page-link">»</span></li>{% endif %}
+      </ul>
+    </nav>
+  {% else %}
+    <div class="alert alert-info">Пока нет опубликованных статей.</div>
+  {% endif %}
+</div>
+{% endblock %}

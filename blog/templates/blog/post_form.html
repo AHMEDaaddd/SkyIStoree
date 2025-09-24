@@ -1,0 +1,16 @@
+{% extends "base.html" %}
+{% block title %}{% if object %}Редактировать{% else %}Создать{% endif %} статью — Блог{% endblock %}
+
+{% block content %}
+<div class="container">
+  <h1 class="mb-4">{% if object %}Редактировать{% else %}Создать{% endif %} статью</h1>
+  <form method="post" enctype="multipart/form-data" class="row g-3">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <div>
+      <button type="submit" class="btn btn-primary">Сохранить</button>
+      <a href="{% if object %}{% url 'blog:detail' object.pk %}{% else %}{% url 'blog:list' %}{% endif %}" class="btn btn-outline-secondary">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

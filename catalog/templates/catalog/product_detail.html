@@ -1,0 +1,34 @@
+{% extends "base.html" %}
+{% load static %}
+{% load catalog_extras %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width: 1140px;">
+  <div class="row">
+    <!-- Фото слева -->
+    <div class="col-md-6">
+      {% if product.image %}
+        <img src="{{ product.image.url }}" class="img-fluid rounded mb-3" alt="{{ product.name }}">
+      {% else %}
+        <img src="{% static 'img/no_photo.png' %}" class="img-fluid rounded mb-3" alt="Нет фото">
+      {% endif %}
+    </div>
+
+    <!-- Описание справа -->
+    <div class="col-md-6">
+      <h1 class="h3 mb-3">{{ product.name }}</h1>
+
+      <!-- Полное описание -->
+      <p class="text-muted" style="white-space:pre-line;">
+        {{ product.description }}
+      </p>
+
+      <p class="fs-5 fw-semibold mb-3">Цена: {{ product.price|usd }}</p>
+
+      <a class="btn btn-outline-secondary" href="{% url 'catalog:home' %}">← Назад</a>
+    </div>
+  </div>
+</div>
+{% endblock %}

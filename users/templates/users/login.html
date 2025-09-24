@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Вход{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:420px;">
+  <h1 class="h3 mb-3">Вход</h1>
+  <form method="post" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        {{ field.label_tag }}
+        {{ field }}
+        {% if field.help_text %}
+          <div class="form-text">{{ field.help_text }}</div>
+        {% endif %}
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">{{ field.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Войти</button>
+    <a class="btn btn-outline-secondary" href="{% url 'catalog:home' %}">Отмена</a>
+  </form>
+</div>
+{% endblock %}

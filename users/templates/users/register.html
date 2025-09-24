@@ -1,0 +1,25 @@
+{% extends "base.html" %}
+{% block title %}Регистрация{% endblock %}
+
+{% block content %}
+<div class="container py-4" style="max-width:720px;">
+  <h1 class="h3 mb-3">Регистрация</h1>
+  <form method="post" enctype="multipart/form-data" novalidate>
+    {% csrf_token %}
+    {% for field in form %}
+      <div class="mb-3">
+        {{ field.label_tag }}           {# метка с корректным for #}
+        {{ field }}                     {# сам инпут #}
+        {% if field.help_text %}
+          <div class="form-text">{{ field.help_text }}</div>
+        {% endif %}
+        {% if field.errors %}
+          <div class="invalid-feedback d-block">{{ field.errors|join:", " }}</div>
+        {% endif %}
+      </div>
+    {% endfor %}
+    <button class="btn btn-primary" type="submit">Зарегистрироваться</button>
+    <a class="btn btn-outline-secondary" href="{% url 'catalog:home' %}">Отмена</a>
+  </form>
+</div>
+{% endblock %}
