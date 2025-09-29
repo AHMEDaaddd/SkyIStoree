@@ -1,21 +1,27 @@
 from django.contrib import admin
-from .models import Category, Product, Contact
+from .models import Category, Product
 
 
-@admin.register(Contact)
-class ContactAdmin(admin.ModelAdmin):
-    list_display = ("id", "title", "phone", "email")
+@admin.register(Category)
+class CategoryAdmin(admin.ModelAdmin):
+    list_display = ("id", "name")
+    search_fields = ("name",)
+    ordering = ("id",)
 
 
 @admin.register(Product)
 class ProductAdmin(admin.ModelAdmin):
-    list_display = ("id", "name", "price", "category")
-    list_filter = ("category",)
+    list_display = (
+        "id",
+        "name",
+        "category",
+        "owner",
+        "is_published",
+        "price",
+        "updated_at",
+    )
+    list_filter = ("category", "is_published")
     search_fields = ("name", "description")
-
-@admin.register(Category)
-class CategoryAdmin(admin.ModelAdmin):
-        list_display = ("id", "name", "is_published", "created_at")
-        list_filter = ("is_published",)
-        search_fields = ("name", "description")
-        prepopulated_fields = {"slug": ("name",)}
+    readonly_fields = ("created_at", "updated_at")
+    autocomplete_fields = ("category", "owner")
+    ordering = ("-updated_at",)
