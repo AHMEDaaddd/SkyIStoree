@@ -1,13 +1,14 @@
 from pathlib import Path
 import os
-from dotenv import load_dotenv
 
 BASE_DIR = Path(__file__).resolve().parent.parent
-load_dotenv(BASE_DIR / ".env")
 
-SECRET_KEY = 'django-insecure-od*@z6u6$g$5!n8+@c1n!^v1@jr$8j0wl#y6qle3*$+k4u3$)m'
-DEBUG = True
-ALLOWED_HOSTS: list[str] = []
+# ------------------------------------------------------------------------------
+# БАЗОВЫЕ НАСТРОЙКИ
+# ------------------------------------------------------------------------------
+SECRET_KEY = os.getenv("SECRET_KEY", "dev-secret-key")
+DEBUG = os.getenv("DEBUG", "1") == "1"
+ALLOWED_HOSTS = os.getenv("ALLOWED_HOSTS", "").split(",") if os.getenv("ALLOWED_HOSTS") else []
 
 INSTALLED_APPS = [
     "django.contrib.admin",
@@ -17,23 +18,11 @@ INSTALLED_APPS = [
     "django.contrib.messages",
     "django.contrib.staticfiles",
 
-    # мои приложения
+    # apps
     "catalog",
     "blog",
-    "users",   # ✅ добавлено
+    "users",
 ]
-
-# кастомная модель пользователя
-AUTH_USER_MODEL = "users.User"
-
-# аутентификация и редиректы
-LOGIN_URL = "users:login"
-LOGIN_REDIRECT_URL = "catalog:home"
-LOGOUT_REDIRECT_URL = "catalog:home"
-
-# email — на этапе разработки выводим письма в консоль
-EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
-DEFAULT_FROM_EMAIL = "noreply@skystore.local"
 
 MIDDLEWARE = [
     "django.middleware.security.SecurityMiddleware",
@@ -64,13 +53,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "core.wsgi.application"
 
+# ------------------------------------------------------------------------------
+# БАЗА ДАННЫХ (оставляю SQLite, как у тебя в проекте)
+# ------------------------------------------------------------------------------
 DATABASES = {
     "default": {
         "ENGINE": "django.db.backends.sqlite3",
-        "NAME": BASE_DIR / "db2.sqlite3",
+        "NAME": BASE_DIR / os.getenv("SQLITE_DB_NAME", "db2.sqlite3"),
     }
 }
 
+# ------------------------------------------------------------------------------
+# ПАРОЛИ / I18N / TZ
+# ------------------------------------------------------------------------------
 AUTH_PASSWORD_VALIDATORS = [
     {"NAME": "django.contrib.auth.password_validation.UserAttributeSimilarityValidator"},
     {"NAME": "django.contrib.auth.password_validation.MinimumLengthValidator"},
@@ -83,8 +78,58 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
-STATIC_URL = "static/"
+# ------------------------------------------------------------------------------
+# СТАТИКА / МЕДИА
+# ------------------------------------------------------------------------------
+STATIC_URL = "/static/"
 MEDIA_URL = "/media/"
 MEDIA_ROOT = BASE_DIR / "media"
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+# ------------------------------------------------------------------------------
+# АУТЕНТИФИКАЦИЯ
+# ------------------------------------------------------------------------------
+AUTH_USER_MODEL = "users.User"
+LOGIN_URL = "users:login"
+LOGIN_REDIRECT_URL = "catalog:home"
+LOGOUT_REDIRECT_URL = "catalog:home"
+
+# ------------------------------------------------------------------------------
+# EMAIL (консоль для разработки)
+# ------------------------------------------------------------------------------
+EMAIL_BACKEND = "django.core.mail.backends.console.EmailBackend"
+DEFAULT_FROM_EMAIL = "noreply@skystore.local"
+
+# ------------------------------------------------------------------------------
+# REDIS + CACHE
+# ------------------------------------------------------------------------------
+# Включение/выключение кеша флажком
+CACHE_ENABLED = os.getenv("CACHE_ENABLED", "1") == "1"
+
+# URL Redis (можешь переписать на docker / memurai)
+REDIS_URL = os.getenv("REDIS_URL", "redis://127.0.0.1:6379/1")
+
+if CACHE_ENABLED:
+    CACHES = {
+        "default": {
+            "BACKEND": "django_redis.cache.RedisCache",
+            "LOCATION": "redis://127.0.0.1:6379/1",
+            "KEY_PREFIX": "skystore",
+            "TIMEOUT": 300,
+            "OPTIONS": {
+                "CLIENT_CLASS": "django_redis.client.DefaultClient",
+                # было: "django_redis.serializers.json.JSONSerializer"
+                "SERIALIZER": "django_redis.serializers.pickle.PickleSerializer",
+            },
+        }
+    }
+else:
+    # fallback на локальный кеш, если кеш выключен
+    CACHES = {
+        "default": {
+            "BACKEND": "django.core.cache.backends.locmem.LocMemCache",
+            "LOCATION": "unique-skystore",
+            "TIMEOUT": 0,  # сразу протухает (по сути выключено)
+        }
+    }

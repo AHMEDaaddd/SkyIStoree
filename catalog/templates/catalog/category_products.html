@@ -1,0 +1,53 @@
+{% extends "base.html" %}
+{% load catalog_extras %}
+
+{% block title %}Товары категории: {{ category.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-3">
+  <h1 class="h4 mb-3">Категория: {{ category.name }}</h1>
+
+  {% if products %}
+    <div class="row g-3">
+      {% for product in products %}
+        <div class="col-12">
+          <div class="card p-3">
+            <div class="d-flex align-items-start gap-3">
+              <div style="width: 180px;">
+                {% if product.image %}
+                  <img src="{{ product.image.url }}" alt="{{ product.name }}" class="img-fluid rounded" style="max-height: 160px; object-fit: cover;">
+                {% else %}
+                  <div class="text-muted small">Нет изображения</div>
+                {% endif %}
+              </div>
+              <div class="flex-grow-1">
+                <h2 class="h5 mb-1">
+                  <a href="{% url 'catalog:product_detail' product.pk %}" class="text-decoration-none">
+                    {{ product.name }}
+                  </a>
+                </h2>
+                <div class="text-muted small mb-2">
+                  Обновлён: {{ product.updated_at|date:"d.m.Y H:i" }}
+                </div>
+                {% if product.description %}
+                  <p class="mb-2">{{ product.description|truncatechars:100 }}</p>
+                {% endif %}
+
+                <div class="fw-semibold">Цена: {{ product.price|usd }}</div>
+
+                <div class="mt-2">
+                  <a class="btn btn-sm btn-primary" href="{% url 'catalog:product_detail' product.pk %}">
+                    Подробнее
+                  </a>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  {% else %}
+    <div class="alert alert-info">В этой категории пока нет опубликованных товаров.</div>
+  {% endif %}
+</div>
+{% endblock %}

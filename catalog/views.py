@@ -1,11 +1,15 @@
+from django.conf import settings
 from django.contrib import messages
 from django.contrib.auth.mixins import (
     LoginRequiredMixin,
     UserPassesTestMixin,
     PermissionRequiredMixin,
 )
+from django.core.cache import cache
 from django.shortcuts import get_object_or_404, redirect
 from django.urls import reverse_lazy
+from django.utils.decorators import method_decorator
+from django.views.decorators.cache import cache_page
 from django.views import View
 from django.views.generic import (
     ListView, DetailView, CreateView, UpdateView, DeleteView, TemplateView
@@ -13,23 +17,47 @@ from django.views.generic import (
 
 from .forms import ProductForm
 from .models import Product, Category
+from .services import get_products_by_category
 
 
-# ------- Каталог / Главная -------
+# ------- Главная: список товаров (низкоуровневый кеш) -------
 class HomeView(ListView):
     model = Product
     template_name = "catalog/home.html"
     context_object_name = "products"
 
     def get_queryset(self):
-        return (
+        cache_key = "home:products"
+        if settings.CACHE_ENABLED:
+            data = cache.get(cache_key)
+            if data is not None:
+                return data
+
+        qs = (
             Product.objects.filter(is_published=True)
             .select_related("category", "owner")
             .order_by("-updated_at")
         )
+        products = list(qs)
+
+        if settings.CACHE_ENABLED:
+            cache.set(cache_key, products, timeout=None)  # можно задать TIMEOUT из настроек
+
+        return products
 
 
 # ------- Товары -------
+# Кеш страницы товара на 5 минут (если включён CACHE_ENABLED)
+def _cache_decorator():
+    if settings.CACHE_ENABLED:
+        return method_decorator(cache_page(60 * 5), name="dispatch")
+    # пустой декоратор, если кеш выключен
+    def passthrough(cls):
+        return cls
+    return passthrough
+
+
+@_cache_decorator()
 class ProductDetailView(DetailView):
     model = Product
     template_name = "catalog/product_detail.html"
@@ -43,14 +71,11 @@ class ProductCreateView(LoginRequiredMixin, CreateView):
     success_url = reverse_lazy("catalog:home")
 
     def form_valid(self, form):
-        # Привязываем владельца
         form.instance.owner = self.request.user
         return super().form_valid(form)
 
 
 class OwnerOnlyMixin(UserPassesTestMixin):
-    """Доступ только владельцу объекта (или суперпользователю)."""
-
     def test_func(self):
         obj = self.get_object()
         u = self.request.user
@@ -60,8 +85,6 @@ class OwnerOnlyMixin(UserPassesTestMixin):
 
 
 class OwnerOrModeratorDeleteMixin(UserPassesTestMixin):
-    """Удалять может владелец, модератор продуктов или суперпользователь."""
-
     def test_func(self):
         obj = self.get_object()
         u = self.request.user
@@ -71,7 +94,6 @@ class OwnerOrModeratorDeleteMixin(UserPassesTestMixin):
             return True
         if obj.owner_id == u.id:
             return True
-        # Группа модераторов
         return u.groups.filter(name="Модератор продуктов").exists()
 
 
@@ -89,7 +111,6 @@ class ProductDeleteView(LoginRequiredMixin, OwnerOrModeratorDeleteMixin, DeleteV
 
 
 class ProductUnpublishView(PermissionRequiredMixin, View):
-    """Снять продукт с публикации (для модераторов)."""
     permission_required = "catalog.can_unpublish_product"
 
     def post(self, request, pk):
@@ -97,6 +118,11 @@ class ProductUnpublishView(PermissionRequiredMixin, View):
         if product.is_published:
             product.is_published = False
             product.save(update_fields=["is_published", "updated_at"])
+            # Чистим кеши, связанные с листингами и деталкой
+            if settings.CACHE_ENABLED:
+                cache.delete("home:products")
+                cache.delete_pattern(f"category:{product.category_id}:*")
+                cache.delete(f"views.decorators.cache.cache_page.{request.get_full_path()}")
             messages.success(request, "Продукт снят с публикации.")
         else:
             messages.info(request, "Продукт уже снят с публикации.")
@@ -113,19 +139,14 @@ class CategoryListView(TemplateView):
         return ctx
 
 
-class CategoryDetailView(ListView):
-    model = Product
-    template_name = "catalog/category_detail.html"
-    context_object_name = "products"
-
-    def get_queryset(self):
-        return (
-            Product.objects.filter(category_id=self.kwargs["pk"], is_published=True)
-            .select_related("category", "owner")
-            .order_by("-updated_at")
-        )
+# Новое отдельное представление: продукты выбранной категории
+class CategoryProductsView(TemplateView):
+    template_name = "catalog/category_products.html"
 
     def get_context_data(self, **kwargs):
         ctx = super().get_context_data(**kwargs)
-        ctx["category"] = get_object_or_404(Category, pk=self.kwargs["pk"])
+        category = get_object_or_404(Category, pk=self.kwargs["pk"])
+        products = get_products_by_category(category.id, only_published=True)
+        ctx["category"] = category
+        ctx["products"] = products
         return ctx
