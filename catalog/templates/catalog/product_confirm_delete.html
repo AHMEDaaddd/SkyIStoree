@@ -1,0 +1,21 @@
+{% extends "base.html" %}
+
+{% block title %}Удалить товар{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+  <h1 class="h4 mb-3">Удалить товар</h1>
+  <div class="alert alert-warning">
+    Вы уверены, что хотите удалить товар
+    <strong>«{{ object }}»</strong>? Это действие необратимо.
+  </div>
+
+  <form method="post">
+    {% csrf_token %}
+    <div class="d-flex gap-2">
+      <button type="submit" class="btn btn-danger">Удалить</button>
+      <a href="{% url 'catalog:product_detail' object.pk %}" class="btn btn-outline-secondary">Отмена</a>
+    </div>
+  </form>
+</div>
+{% endblock %}

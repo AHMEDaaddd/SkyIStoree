@@ -1,0 +1,65 @@
+{% extends "base.html" %}
+{% load catalog_extras %}
+
+{% block title %}{{ product.name }}{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+
+  <div class="row g-4">
+    <!-- Фото слева -->
+    <div class="col-md-5">
+      <div class="card">
+        {% if product.image %}
+          <img src="{{ product.image.url }}" class="card-img-top" alt="{{ product.name }}">
+        {% else %}
+          <div class="card-body text-center text-muted">Изображение отсутствует</div>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Текст справа -->
+    <div class="col-md-7 d-flex flex-column">
+      <h1 class="h3 mb-2">{{ product.name }}</h1>
+
+      <div class="mb-2">
+        <span class="badge {{ product.is_published|yesno:'text-bg-success,text-bg-secondary' }}">
+          {{ product.is_published|yesno:"Опубликован,Черновик" }}
+        </span>
+        {% if product.category %}
+          <span class="badge text-bg-light">Категория: {{ product.category.name }}</span>
+        {% endif %}
+      </div>
+
+      {% if product.owner %}
+        <div class="text-muted small mb-2">Владелец: {{ product.owner.username|default:product.owner.email }}</div>
+      {% endif %}
+
+      {% if product.description %}
+        <p class="mb-3">{{ product.description }}</p>
+      {% endif %}
+
+      <div class="fs-5 fw-semibold mb-4">Цена: {{ product.price|usd }}</div>
+
+      <div class="mt-auto d-flex gap-2">
+        {# Кнопки правим по условиям #}
+
+        {# Редактировать/Удалить — только владелец #}
+        {% if request.user.is_authenticated and product.owner_id == request.user.id %}
+          <a class="btn btn-outline-primary btn-sm" href="{% url 'catalog:product_update' product.pk %}">Редактировать</a>
+          <a class="btn btn-outline-danger btn-sm" href="{% url 'catalog:product_delete' product.pk %}">Удалить</a>
+        {% endif %}
+
+        {# Снять с публикации — у кого есть право can_unpublish_product #}
+        {% if perms.catalog.can_unpublish_product and product.is_published %}
+          <form method="post" action="{% url 'catalog:product_unpublish' product.pk %}">
+            {% csrf_token %}
+            <button class="btn btn-warning btn-sm" type="submit">Снять с публикации</button>
+          </form>
+        {% endif %}
+      </div>
+    </div>
+  </div>
+
+</div>
+{% endblock %}
